@@ -1,0 +1,5 @@
+# 临时文件夹，不需要被git追踪管理
+/tmp
+
+# cygwin目录是其安装以及一大批构建 QGIS/OSGeo4W 所需的软件包，不需要被git追踪管理
+/cygwin
