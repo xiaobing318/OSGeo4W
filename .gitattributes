@@ -1,0 +1,2 @@
+# 所有被 Git 当作文本的文件统一使用 LF
+* text eol=lf
