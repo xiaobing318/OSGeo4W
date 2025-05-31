@@ -1,3 +1,5 @@
+# 20250529
+
 以下内容将帮助入门开发者理解 **bootstrap.cmd** 与 **bootstrap.sh** 在 OSGeo4W 项目中的角色、差异以及它们解决的问题。
 
 ## 概要
@@ -99,3 +101,62 @@ GitHub 仓库中同时包含这两个文件，即可在对应平台无缝使用 
 [7]: https://unix.stackexchange.com/questions/136547/what-is-the-difference-between-running-bash-script-sh-and-script-sh?utm_source=chatgpt.com "What is the difference between running \"bash script.sh\" and \"./script ..."
 [8]: https://raw.githubusercontent.com/qgis/QGIS/master/INSTALL.md?utm_source=chatgpt.com "https://raw.githubusercontent.com/qgis/QGIS/master..."
 [9]: https://www.techtarget.com/searchwindowsserver/definition/batch-file?utm_source=chatgpt.com "What is a Batch File? | Definition from TechTarget"
+
+# 20250531
+在 OSGeo4W 仓库里的 **bootstrap.cmd** 其实就是一个面向 Windows `cmd.exe` 的批处理脚本；它用来静默下载并安装 Cygwin 及一大批构建 QGIS/OSGeo4W 所需的软件包，然后把后续的 *bootstrap.sh* 转交给刚装好的 Cygwin 去执行。下面先快速概览结论，再逐条说明——.cmd 与 .bat 同属批处理，但 .cmd 诞生于 Windows NT 时代，对 cmd.exe 更友好且在 **PATHEXT** 搜索顺序中优先；脚本中的 `^` 把一条很长的安装命令拆成多行；注释可用 `REM` 或 `::`；整个流程在 Linux bash 下不会直接解析。
+
+## 1 bootstrap.cmd 是不是脚本文件
+
+* **是。** “.cmd”/“.bat” 都是纯文本批处理脚本，由 `cmd.exe` 解释执行。([Server Fault][1], [Stack Overflow][2])
+
+## 2 能否在 Linux bash 下直接运行
+
+* Windows 批处理语法（IF/REM、环境变量 `%VAR%` 等）只受 `cmd.exe` 支持；bash 不认识这套语法，因此在原生 Linux 上直接运行会报错。若确实要用，可借 Wine 或在 WSL 里执行 `cmd /c bootstrap.cmd`。([Super User][3], [Cygwin][4])
+
+## 3 为什么用“.cmd”而非“.bat”
+
+1. **历史差异**：.bat 最早给 16-bit `COMMAND.COM` 用；.cmd 随 Windows NT 出现，专属 `cmd.exe`。([Server Fault][1], [Stack Overflow][5])
+2. **优先级**：在 **PATHEXT** 搜索顺序里 .cmd 通常排在 .bat 前，能避免“同名双扩展”时执行到旧的 .bat。([Stack Overflow][5])
+3. **错误级别行为**：某些内部命令（SET/ASSOC 等）在 .cmd 里总会设置 `ERRORLEVEL`，而 .bat 只在出错时设置，脚本作者更容易做可靠的错误检测。([Stack Overflow][2])
+
+## 4 在 bootstrap.cmd 里添加注释的方法
+
+* **`REM`** 行：`REM 这是注释`   ([Microsoft Learn][6])
+* **`::`** 行：`:: 也是注释`（速度快，但偶尔受 `ENABLEEXTENSIONS` 影响）。([Stack Overflow][7], [Microsoft Answers][8])
+
+## 5 逐行详解 bootstrap.cmd
+
+| 行号   | 代码                                              | 作用                                                                                                                                                                                   | 关键点                                                              |
+| ---- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| 1    | `if not exist scripts mkdir scripts`            | 若不存在 scripts 目录则创建                                                                                                                                                                   | 典型的 `IF NOT EXIST dir MKDIR dir` 写法，用于保持源码根干净。([hexnode.com][9]) |
+| 3    | `if defined CI echo ::group::Installing cygwin` | 在 CI 环境（GitHub Actions 等）里向日志输出分组标签，方便折叠显示                                                                                                                                           | `IF DEFINED var` 检测环境变量是否存在                                      |
+| 4-5  | `if not exist scripts/setup-x86_64.exe curl …`  | 缺少安装器时，用 curl 下载安装器 `setup-x86_64.exe`                                                                                                                                               | `curl --output <目标> <URL>` 下载文件                                  |
+| 6-12 | `scripts\setup-x86_64.exe ^`                    | 调用 Cygwin 安装器并用 `^` 把长命令分行                                                                                                                                                           | `^` 是批处理的续行符号，可将一条命令拆到多行([Stack Overflow][10])                   |
+|      | `  -qnNdOW ^`                                   | 组合开关：<br>-q = quiet (静默)；<br>-n = --no-shortcuts；<br>-N = --no-admin；<br>-dO /W 常与下载/无桌面图标相关（官方写法为 `--no-desktop --no-startmenu --download`，这里作者简写）。([Super User][11], [Cygwin][12]) |                                                                  |
+|      | `  -R %CD%/cygwin ^`                            | 指定 Cygwin 根目录为 `<当前git根>/cygwin`                                                                                                                                                     |                                                                  |
+|      | `  -s http://cygwin.mirror.constant.com ^`      | 选定镜像站点（-s/site）                                                                                                                                                                      |                                                                  |
+|      | `  -l %TEMP%/cygwin ^`                          | 把下载的包缓存到临时目录 %TEMP%\cygwin                                                                                                                                                           |                                                                  |
+|      | `  -P "bison,flex,…perl-YAML-Tiny"`             | 一次性安装所列全部包（-P/--packages）([Stack Overflow][13], [Stack Overflow][14])                                                                                                                |                                                                  |
+| 13   | `if defined CI echo ::endgroup::`               | 在 CI 日志里结束分组标签                                                                                                                                                                       |                                                                  |
+| 15   | `copy bootstrap.sh cygwin\tmp`                  | 把随仓库提供的 bootstrap.sh 复制进 Cygwin 临时目录，方便后一步由 bash 执行                                                                                                                                  |                                                                  |
+| 16   | `cygwin\bin\bash /tmp/bootstrap.sh %*`          | 用刚装好的 Cygwin bash 执行脚本，并把当前 cmd 收到的全部参数(`%*`)原样传递过去，实现后续构建步骤                                                                                                                         | OSGeo4W 的整个自动化构建随后都在类 POSIX 环境内完成。([trac.osgeo.org][15])         |
+
+> **小提示**：如需在脚本中再插入注释，可直接在上述行前加 `REM` 或 `::`；若要临时禁用某行命令，也可在行首加 `::` 或 `REM`.
+
+这样，bootstrap.cmd 完成了：①确保本地有 Cygwin 与所需包；②在 CI 环境输出可折叠日志段；③把控制权交给 bootstrap.sh 进入 POSIX 流水线。
+
+[1]: https://serverfault.com/questions/17899/whats-the-difference-between-cmd-and-bat-files?utm_source=chatgpt.com "What's the difference between .cmd and .bat files? - Server Fault"
+[2]: https://stackoverflow.com/questions/148968/windows-batch-files-bat-vs-cmd?utm_source=chatgpt.com "Windows batch files: .bat vs .cmd? - Stack Overflow"
+[3]: https://superuser.com/questions/897644/how-does-windows-decide-which-executable-to-run?utm_source=chatgpt.com "How does windows decide which executable to run - Super User"
+[4]: https://www.cygwin.com/faq/faq.html?utm_source=chatgpt.com "Cygwin FAQ"
+[5]: https://stackoverflow.com/questions/605101/order-in-which-command-prompt-executes-files-with-the-same-name-a-bat-vs-a-cmd?utm_source=chatgpt.com "Order in which command prompt executes files with the same name ..."
+[6]: https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/rem?utm_source=chatgpt.com "rem | Microsoft Learn"
+[7]: https://stackoverflow.com/questions/11269338/how-to-comment-out-add-comment-in-a-batch-cmd?utm_source=chatgpt.com "How to \"comment-out\" (add comment) in a batch/cmd?"
+[8]: https://answers.microsoft.com/en-us/windows/forum/all/comments-in-batch-files/bb73da92-5bfc-41ff-9d59-c1b82de2c0d8?utm_source=chatgpt.com "Comments in batch files - Microsoft Community"
+[9]: https://www.hexnode.com/mobile-device-management/help/script-to-create-a-new-folder-if-it-doesnt-exist-on-windows-10/?utm_source=chatgpt.com "Script to create a new folder if it doesn't exist on Windows 10"
+[10]: https://stackoverflow.com/questions/69068/split-long-commands-in-multiple-lines-through-windows-batch-file?utm_source=chatgpt.com "Split long commands in multiple lines through Windows batch file"
+[11]: https://superuser.com/questions/214831/how-to-update-cygwin-from-cygwins-command-line?utm_source=chatgpt.com "How to update Cygwin from Cygwin's command line? - Super User"
+[12]: https://cygwin.readthedocs.io/en/stable/install/?utm_source=chatgpt.com "Install and maintain Cygwin"
+[13]: https://stackoverflow.com/questions/9260014/how-do-i-install-cygwin-components-from-the-command-line?utm_source=chatgpt.com "How do I install cygwin components from the command line?"
+[14]: https://stackoverflow.com/questions/44354169/how-to-install-g-in-cygwin?utm_source=chatgpt.com "How to install g++ in Cygwin? - Stack Overflow"
+[15]: https://trac.osgeo.org/osgeo4w/wiki/SetupDevelopment?utm_source=chatgpt.com "SetupDevelopment – OSGeo4W - OSGeo Trac Instances"
