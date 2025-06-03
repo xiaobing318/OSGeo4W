@@ -6,3 +6,6 @@
 
 # scripts目录中的一些可执行程序不需要被git追踪管理
 /scripts/setup-x86_64.exe
+
+# 项目中的PDF不需要被git追踪管理
+*.pdf
