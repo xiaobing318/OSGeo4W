@@ -9,6 +9,8 @@
 /scripts/osgeo4w-setup.exe
 /scripts/vs2022/*
 /scripts/vs_BuildTools.exe
+/scripts/winsdksetup-2120843.exe
+/scripts/ninja.exe
 
 # 项目中的PDF不需要被git追踪管理
 *.pdf
