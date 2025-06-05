@@ -7,6 +7,8 @@
 # scripts目录中的一些可执行程序不需要被git追踪管理
 /scripts/setup-x86_64.exe
 /scripts/osgeo4w-setup.exe
+/scripts/vs2022/*
+/scripts/vs_BuildTools.exe
 
 # 项目中的PDF不需要被git追踪管理
 *.pdf
@@ -14,3 +16,4 @@
 # src目录中有些文件是编译所需要而下载的，不需要被git追踪管理
 /src/*/osgeo4w/osgeo4w/*
 /src/*/osgeo4w/package.log
+/src/qgis-ltr/qgis
