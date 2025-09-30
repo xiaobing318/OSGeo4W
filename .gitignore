@@ -1,0 +1,5 @@
+# 忽略 MacOS 平台上文件系统的隐藏文件
+**/.DS_Store
+
+# 忽略 .vscode 目录，这个目录是 visual studio code的配置目录
+.vscode
