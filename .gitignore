@@ -1,0 +1,185 @@
+# ignore generated/downloaded artifacts and common OS/IDE noise to keep this repo clean across Windows, Linux and macOS.
+
+# ------------------------------------------------------------------------------
+# OS-generated files
+# ------------------------------------------------------------------------------
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.stackdump
+
+# Linux / general
+*~
+.nfs*
+.Trash-*/
+
+# ------------------------------------------------------------------------------
+# Editors / IDEs
+# ------------------------------------------------------------------------------
+
+.vscode/
+.idea/
+*.iml
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Vim/Emacs swap & backups
+*.swp
+*.swo
+*.tmp
+*.bak
+*.orig
+*.rej
+*.log
+*.log.*
+
+# ------------------------------------------------------------------------------
+# Build / tool caches
+# ------------------------------------------------------------------------------
+
+# CMake / Ninja
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+.ninja_deps
+.ninja_log
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/
+
+# ------------------------------------------------------------------------------
+# OSGeo4W build system outputs (repo-level)
+# ------------------------------------------------------------------------------
+
+# bootstrap.cmd installs Cygwin here
+/cygwin/
+
+# local build status markers written by scripts/build.sh
+tmp/
+
+# local package repository output written by scripts/build-helpers (regen)
+/x86_64/
+/package-cache/
+
+# private OSGeo4W root (if fetchdeps is run from repo root)
+/osgeo4w/
+
+# local env overrides used by scripts/build.sh
+/.buildenv
+
+# ------------------------------------------------------------------------------
+# Downloaded helper tools (scripts/build-helpers, bootstrap.cmd)
+# ------------------------------------------------------------------------------
+
+/scripts/setup-x86_64.exe
+/scripts/setup-x86.exe
+/scripts/osgeo4w-setup.exe
+/scripts/vs_BuildTools.exe
+/scripts/vs_buildtools.exe
+/scripts/winsdksetup-*.exe
+/scripts/ninja.exe
+/scripts/ccache.exe
+/scripts/cmake/
+/scripts/cmake-*-windows-x86_64.zip
+
+# optional local hooks executed by scripts/build-helpers (keep out of git)
+/scripts/start
+/scripts/fail
+/scripts/finish
+
+# ------------------------------------------------------------------------------
+# Package build working trees under src/*/osgeo4w
+# ------------------------------------------------------------------------------
+
+# logs (startlog/savelog)
+package.log*
+pip.log*
+
+# generated env files
+pip.env
+pipped.env
+
+# common marker files
+patched
+exclude
+testfailure
+built
+installed
+configured
+tested
+*.done
+*.built
+
+# downloaded archives dropped into recipe dirs (wget/curl)
+src/**/osgeo4w/*.tar.gz
+src/**/osgeo4w/*.tar.bz2
+src/**/osgeo4w/*.tar.xz
+src/**/osgeo4w/*.tgz
+src/**/osgeo4w/*.tbz2
+src/**/osgeo4w/*.txz
+src/**/osgeo4w/*.zip
+src/**/osgeo4w/*.7z
+src/**/osgeo4w/*.gz
+src/**/osgeo4w/*.bz2
+src/**/osgeo4w/*.xz
+src/**/osgeo4w/*.msi
+src/**/osgeo4w/*.exe
+
+# generated helper files in some recipes
+src/**/osgeo4w/*.lst
+src/**/osgeo4w/*-postinstall.bat
+src/**/osgeo4w/*-preremove.bat
+src/**/osgeo4w/ini.bat
+src/**/osgeo4w/sitecustomize.py
+src/**/osgeo4w/preremove-cached.py
+src/**/osgeo4w/build.sh
+src/**/osgeo4w/init.sh
+
+# build/install trees and VCS checkouts created inside recipe dirs
+src/**/osgeo4w/*/
+!src/**/osgeo4w/gdaldeps/
+src/**/osgeo4w/gdaldeps/*
+!src/**/osgeo4w/gdaldeps/*.sha256sum
+
+# ------------------------------------------------------------------------------
+# Upstream source trees extracted/cloned under src/<pkg>/
+# ------------------------------------------------------------------------------
+
+# typical tarball extractions create versioned dirs next to osgeo4w/
+src/*/*-[0-9]*/
+
+# known non-versioned clones created by some recipes
+src/qt5/qt5/
+src/xz/xz/
+src/gdal-dev/gdal/
+src/grass-dev/grass/
+src/qwc2/qwc2-demo-app/
+src/icu/icu/
+src/icu/source/

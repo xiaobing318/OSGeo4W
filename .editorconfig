@@ -1,0 +1,73 @@
+root = true
+
+[*]
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Markdown uses trailing spaces for hard line breaks
+[*.md]
+trim_trailing_whitespace = true
+
+# Patch/diff files may rely on trailing whitespace
+[*.patch]
+end_of_line = lf
+trim_trailing_whitespace = false
+
+[*.diff]
+end_of_line = lf
+trim_trailing_whitespace = false
+
+[**/osgeo4w/patch]
+end_of_line = lf
+trim_trailing_whitespace = false
+
+[**/osgeo4w/diff]
+end_of_line = lf
+trim_trailing_whitespace = false
+
+# Shell/tooling scripts should be LF
+[*.sh]
+end_of_line = lf
+
+[*.pl]
+end_of_line = lf
+
+[*.py]
+end_of_line = lf
+indent_style = space
+indent_size = 4
+
+[*.cmake]
+end_of_line = lf
+
+[CMakeLists.txt]
+end_of_line = lf
+
+[scripts/build-helpers]
+end_of_line = lf
+
+[scripts/genini]
+end_of_line = lf
+
+# Checksums: keep LF so verification tools work reliably
+[*.sha256sum]
+end_of_line = lf
+
+[*.sha512]
+end_of_line = lf
+
+# Windows command scripts
+[*.bat]
+end_of_line = crlf
+
+[*.cmd]
+end_of_line = crlf
+
+# YAML
+[*.yml]
+indent_style = space
+indent_size = 2
+
+[*.yaml]
+indent_style = space
+indent_size = 2
