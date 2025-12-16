@@ -94,6 +94,18 @@ tmp/
 # local env overrides used by scripts/build.sh
 /.buildenv
 
+# other files
+md5sums
+src/qgis-qt6/qgis/
+src/qfield-dev/qfield/
+
+# downloaded files frome http://download.osgeo.org/osgeo4w/v2/x86_64/
+remote-setup.ini
+license.map
+
+# Custom script files
+GeneateNestedHints.pl
+
 # ------------------------------------------------------------------------------
 # Downloaded helper tools (scripts/build-helpers, bootstrap.cmd)
 # ------------------------------------------------------------------------------
