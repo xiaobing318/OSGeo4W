@@ -285,14 +285,10 @@ vs2022env() {
 			10.0.19041.*)
 				;;
 			*)
-				if [ -n "$OSGEO4W_SKIP_DBGHELP_REPLACE" ]; then
-					log "Keeping $dhd $v (replacement disabled)"
-				else
-					log Replacing $dhd $v
-					curl -o /tmp/qgis.tar.bz2 http://download.osgeo.org/osgeo4w/v2/x86_64/release/qgis/qgis-ltr/qgis-ltr-3.34.5-1.tar.bz2
-					tar -C "${dhd%/*}" -xjvf /tmp/qgis.tar.bz2 --xform "s,.*/,," apps/qgis-ltr/dbghelp.dll apps/qgis-ltr/symsrv.dll
-					rm /tmp/qgis.tar.bz2
-				fi
+				log Replacing $dhd $v
+				curl -o /tmp/qgis.tar.bz2 http://download.osgeo.org/osgeo4w/v2/x86_64/release/qgis/qgis-ltr/qgis-ltr-3.34.5-1.tar.bz2
+				tar -C "${dhd%/*}" -xjvf /tmp/qgis.tar.bz2 --xform "s,.*/,," apps/qgis-ltr/dbghelp.dll apps/qgis-ltr/symsrv.dll
+				rm /tmp/qgis.tar.bz2
 				;;
 			esac
 		fi
