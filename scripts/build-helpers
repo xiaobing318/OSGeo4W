@@ -223,7 +223,8 @@ declare -x vs2019env
 fileversion() {
 	local ps="$(cygpath -a --sysdir)/WindowsPowerShell/v1.0/powershell.exe"
 	local v=$($ps -Command "(Get-Item \"$(cygpath -aw "$1")\").VersionInfo.ProductVersion")
-	v=${v%}
+	v=${v%
+}
 	echo $v
 }
 declare -x fileversion
@@ -284,10 +285,14 @@ vs2022env() {
 			10.0.19041.*)
 				;;
 			*)
-				log Replacing $dhd $v
-				curl -o /tmp/qgis.tar.bz2 http://download.osgeo.org/osgeo4w/v2/x86_64/release/qgis/qgis-ltr/qgis-ltr-3.34.5-1.tar.bz2
-				tar -C "${dhd%/*}" -xjvf /tmp/qgis.tar.bz2 --xform "s,.*/,," apps/qgis-ltr/dbghelp.dll apps/qgis-ltr/symsrv.dll
-				rm /tmp/qgis.tar.bz2
+				if [ -n "$OSGEO4W_SKIP_DBGHELP_REPLACE" ]; then
+					log "Keeping $dhd $v (replacement disabled)"
+				else
+					log Replacing $dhd $v
+					curl -o /tmp/qgis.tar.bz2 http://download.osgeo.org/osgeo4w/v2/x86_64/release/qgis/qgis-ltr/qgis-ltr-3.34.5-1.tar.bz2
+					tar -C "${dhd%/*}" -xjvf /tmp/qgis.tar.bz2 --xform "s,.*/,," apps/qgis-ltr/dbghelp.dll apps/qgis-ltr/symsrv.dll
+					rm /tmp/qgis.tar.bz2
+				fi
 				;;
 			esac
 		fi
@@ -473,6 +478,8 @@ fetchdeps() {
 
 	local cmd
 	cmd="$OSGEO4W_SCRIPTS/osgeo4w-setup.exe"
+	# setting proxy for speedup downloads
+	cmd="$cmd -p 127.0.0.1:7897"
 	cmd="$cmd --root $(cygpath -am $OSGEO4W_PWD/osgeo4w)"
 	cmd="$cmd --autoaccept"
 	# cmd="$cmd --advanced"
