@@ -5,7 +5,8 @@ export MAINTAINER=JuergenFischer
 export BUILDDEPENDS="expat-devel fcgi-devel proj-devel qt6-qml qt6-oci sqlite3-devel geos-devel gsl-devel libiconv-devel libzip-devel libspatialindex-devel python3-pip python3-pyqt6 python3-sip python3-pyqt-builder python3-devel python3-pyqt6-qscintilla python3-nose2 python3-future python3-pyyaml python3-mock python3-six qca-qt6-devel qscintilla-qt6-devel qt6-devel qwt-qt6-devel libspatialite-devel oci-devel qtkeychain-qt6-devel zlib-devel opencl-devel exiv2-devel protobuf-devel python3-setuptools zstd-devel libpq-devel libxml2-devel hdf5-devel hdf5-tools netcdf-devel pdal pdal-devel grass draco-devel libtiff-devel python3-oauthlib gdal-devel"
 export PACKAGES="qgis-qt6 qgis-qt6-common qgis-qt6-deps qgis-qt6-devel qgis-qt6-full qgis-qt6-full-free qgis-qt6-grass-plugin qgis-qt6-oracle-provider qgis-qt6-pdb qgis-qt6-server"
 
-: ${REPO:=https://github.com/qgis/QGIS.git}
+#: ${REPO:=https://github.com/qgis/QGIS.git}
+: ${REPO:=https://github.com/xiaobing318/QGIS.git}
 : ${SITE:=qgis.org}
 : ${TARGET:=Release}
 : ${CC:=cl.exe}
@@ -19,10 +20,11 @@ source ../../../scripts/build-helpers
 startlog
 
 # Get latest release branch
-RELBRANCH=$(git ls-remote --heads $REPO "refs/heads/release-*_*" | sed -e '/\^{}$/d' -ne 's#^.*refs/heads/release-#release-#p' | sort -V | tail -1)
-RELBRANCH=${RELBRANCH#*/}
+#RELBRANCH=$(git ls-remote --heads $REPO "refs/heads/release-*_*" | sed -e '/\^{}$/d' -ne 's#^.*refs/heads/release-#release-#p' | sort -V | tail -1)
+#RELBRANCH=${RELBRANCH#*/}
 
-RELTAG=$(git ls-remote --tags $REPO "refs/tags/final-${RELBRANCH#release-}_*" | sed -e '/\^{}$/d' -ne 's#^.*refs/tags/final-#final-#p' | sort -V | tail -1)
+#RELTAG=$(git ls-remote --tags $REPO "refs/tags/final-${RELBRANCH#release-}_*" | sed -e '/\^{}$/d' -ne 's#^.*refs/tags/final-#final-#p' | sort -V | tail -1)
+RELTAG=final-3_44_5-llama-server
 
 cd ..
 
@@ -30,11 +32,17 @@ if [ -d qgis ]; then
 	cd qgis
 	git config core.filemode false
 
-	git fetch origin +refs/tags/$RELTAG:refs/tags/$RELTAG
+	# RELTAG may be a tag (upstream) or a branch (custom forks). Try tags first and fall back to heads.
+	if ! git fetch origin +refs/tags/$RELTAG:refs/tags/$RELTAG; then
+		git fetch origin +refs/heads/$RELTAG:refs/remotes/origin/$RELTAG
+	fi
 	git clean -f
 	git reset --hard
 
-	git checkout -f $RELTAG
+	git checkout -f $RELTAG || git checkout -f -B $RELTAG origin/$RELTAG
+	if git show-ref --verify --quiet refs/remotes/origin/$RELTAG; then
+		git reset --hard origin/$RELTAG
+	fi
 else
 	git clone $REPO --branch $RELTAG --single-branch --depth 1 qgis
 	cd qgis
@@ -127,6 +135,7 @@ nextbinary
 		-D BUILD_WITH_QT5=FALSE \
 		-D BUILD_WITH_QT6=TRUE \
 		-D WITH_QTWEBKIT=FALSE \
+		-D WITH_QTWEBENGINE=TRUE \
 		-D USE_OPENCL=TRUE \
 		-D WITH_3D=TRUE \
 		-D WITH_PDAL=TRUE \
@@ -263,7 +272,7 @@ requires: msvcrt2019 $RUNTIMEDEPENDS libpq geos zstd gsl gdal libspatialite zlib
 external-source: $P
 EOF
 
-	cp ../qgis/COPYING $P-common-$V-$B.txt
+	cp ../qgis/COPYING $R/$P-common/$P-common-$V-$B.txt
 	/bin/tar -C install -cjf $R/$P-common/$P-common-$V-$B.tar.bz2 \
 		--exclude-from exclude \
 		--exclude "*.pyc" \
@@ -327,7 +336,7 @@ requires: $P-common fcgi
 external-source: $P
 EOF
 
-	cp ../qgis/COPYING $P-server-$V-$B.txt
+	cp ../qgis/COPYING $R/$P-server/$P-server-$V-$B.txt
 	/bin/tar -C install -cjf $R/$P-server/$P-server-$V-$B.tar.bz2 \
 		--exclude-from exclude \
 		--exclude "*.pyc" \
@@ -359,6 +368,7 @@ EOF
 	        apps/$P/plugins/plugin_offlineediting.dll \
 	        apps/$P/plugins/plugin_topology.dll \
 	        apps/$P/plugins/plugin_geometrychecker.dll \
+	        apps/$P/plugins/plugin_qcopilots.dll \
 	        apps/$P/qtplugins/sqldrivers/qsqlspatialite.dll \
 	        apps/$P/qtplugins/designer/ \
 	        apps/$P/resources/customization.xml \
