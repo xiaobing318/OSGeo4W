@@ -16,4 +16,5 @@ rem Set VSI cache to be used as buffer, see #6448
 set VSI_CACHE=TRUE
 set VSI_CACHE_SIZE=1000000
 set QT_PLUGIN_PATH=%OSGEO4W_ROOT%\apps\@package@\qtplugins;%OSGEO4W_ROOT%\apps\qt6\plugins
+set QTWEBENGINE_DISABLE_SANDBOX=1
 start "QGIS" /B "%OSGEO4W_ROOT%\bin\@package@-bin.exe" %*
