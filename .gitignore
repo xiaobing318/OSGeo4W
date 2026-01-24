@@ -36,6 +36,11 @@ $RECYCLE.BIN/
 *.userosscache
 *.sln.docstates
 
+# ------------------------------------------------------------------------------
+# Codex
+# ------------------------------------------------------------------------------
+AGENTS.override.md
+LocalMaterials
 
 # Vim/Emacs swap & backups
 *.swp
