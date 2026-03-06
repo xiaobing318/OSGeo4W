@@ -1,0 +1,43 @@
+# https://EditorConfig.org
+
+# 顶层 EditorConfig 文件
+root = true
+
+# 全局默认：使用 LF、保留文件末尾换行、删除行尾空格
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# 补丁和差异文件可能依赖行尾空格，这里不自动删除
+[*.patch]
+trim_trailing_whitespace = false
+
+[*.diff]
+trim_trailing_whitespace = false
+
+[**/osgeo4w/patch]
+trim_trailing_whitespace = false
+
+[**/osgeo4w/diff]
+trim_trailing_whitespace = false
+
+[*.py]
+indent_style = space
+indent_size = 4
+
+# 批处理脚本使用 CRLF 换行
+[*.bat]
+end_of_line = crlf
+
+[*.cmd]
+end_of_line = crlf
+
+# 注册表模板使用 CRLF 换行
+[*.reg.tmpl]
+end_of_line = crlf
+
+# yml 文件使用 2 个空格缩进
+[*.yml]
+indent_style = space
+indent_size = 2

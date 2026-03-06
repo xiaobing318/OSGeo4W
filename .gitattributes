@@ -1,0 +1,46 @@
+# 统一文本文件与换行规则，减少跨平台协作差异。
+
+# 默认：自动识别文本文件；二进制文件不做文本转换。
+* text=auto
+
+# 仓库元数据文件统一为 LF
+.gitattributes text eol=lf
+.gitignore text eol=lf
+.editorconfig text eol=lf
+
+# 脚本文件统一为 LF
+*.sh text eol=lf
+*.pl text eol=lf
+*.py text eol=lf
+*.cmake text eol=lf
+CMakeLists.txt text eol=lf
+
+# 无扩展名脚本统一为 LF
+scripts/build-helpers text eol=lf
+scripts/genini text eol=lf
+
+# 补丁、差异文件统一为 LF
+*.patch text eol=lf
+*.diff text eol=lf
+src/**/osgeo4w/patch text eol=lf
+src/**/osgeo4w/diff text eol=lf
+
+# 校验文件统一为 LF
+*.sha256sum text eol=lf
+*.sha512 text eol=lf
+
+# 常见模板和列表文件统一为 LF
+*.lst text eol=lf
+*.hint text eol=lf
+*.vars text eol=lf
+*.conf.tmpl text eol=lf
+
+# 批处理脚本统一为 CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.reg.tmpl text eol=crlf
+
+# 二进制文件：不做换行转换，也不按文本比较
+*.exe binary
+*.ico binary
+*.bmp binary
