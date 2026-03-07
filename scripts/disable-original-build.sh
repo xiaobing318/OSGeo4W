@@ -47,7 +47,7 @@ PKGS=$(perl scripts/build-inorder.pl "$@" | paste -d" " -s)
 
 if [ -z "$OSGEO4W_BUILD_RDEPS" ]; then
 	# but only requested packages
-	PKGS=$(echo "$PKGS" | tr ' ' '\n' | fgrep -x -f <(echo "$@" | tr ' ' '\n') | paste -d" " -s)
+	echo $PKGS | fgrep -x <(echo "$@" | tr ' ' '\n')
 fi
 
 echo $(date): REPOSITORY: $OSGEO4W_REP

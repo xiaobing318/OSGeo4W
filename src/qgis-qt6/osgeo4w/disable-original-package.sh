@@ -5,7 +5,7 @@ export MAINTAINER=JuergenFischer
 export BUILDDEPENDS="expat-devel fcgi-devel proj-devel qt6-qml qt6-oci sqlite3-devel geos-devel gsl-devel libiconv-devel libzip-devel libspatialindex-devel python3-pip python3-pyqt6 python3-sip python3-pyqt-builder python3-devel python3-pyqt6-qscintilla python3-nose2 python3-future python3-pyyaml python3-mock python3-six qca-qt6-devel qscintilla-qt6-devel qt6-devel qwt-qt6-devel libspatialite-devel oci-devel qtkeychain-qt6-devel zlib-devel opencl-devel exiv2-devel protobuf-devel python3-setuptools zstd-devel libpq-devel libxml2-devel hdf5-devel hdf5-tools netcdf-devel pdal pdal-devel grass draco-devel libtiff-devel python3-oauthlib gdal-devel"
 export PACKAGES="qgis-qt6 qgis-qt6-common qgis-qt6-deps qgis-qt6-devel qgis-qt6-full qgis-qt6-full-free qgis-qt6-grass-plugin qgis-qt6-oracle-provider qgis-qt6-pdb qgis-qt6-server"
 
-: ${REPO:=https://github.com/xiaobing318/QGIS.git}
+: ${REPO:=https://github.com/qgis/QGIS.git}
 : ${SITE:=qgis.org}
 : ${TARGET:=Release}
 : ${CC:=cl.exe}
@@ -18,8 +18,11 @@ source ../../../scripts/build-helpers
 
 startlog
 
-# Fixed branch for custom QGIS repository
-RELTAG=baseline/final-4_0_0
+# Get latest release branch
+RELBRANCH=$(git ls-remote --heads $REPO "refs/heads/release-*_*" | sed -e '/\^{}$/d' -ne 's#^.*refs/heads/release-#release-#p' | sort -V | tail -1)
+RELBRANCH=${RELBRANCH#*/}
+
+RELTAG=$(git ls-remote --tags $REPO "refs/tags/final-${RELBRANCH#release-}_*" | sed -e '/\^{}$/d' -ne 's#^.*refs/tags/final-#final-#p' | sort -V | tail -1)
 
 cd ..
 
@@ -27,12 +30,11 @@ if [ -d qgis ]; then
 	cd qgis
 	git config core.filemode false
 
-	git fetch origin +refs/heads/$RELTAG:refs/remotes/origin/$RELTAG
+	git fetch origin +refs/tags/$RELTAG:refs/tags/$RELTAG
 	git clean -f
 	git reset --hard
 
-	git checkout -f $RELTAG || git checkout -f -B $RELTAG origin/$RELTAG
-	git reset --hard origin/$RELTAG
+	git checkout -f $RELTAG
 else
 	git clone $REPO --branch $RELTAG --single-branch --depth 1 qgis
 	cd qgis
@@ -161,7 +163,6 @@ nextbinary
 		-D QSCINTILLA_LIBRARY=$(cygpath -am $O4W_ROOT/apps/Qt6/lib/qscintilla2.lib) \
 		-D DART_TESTING_TIMEOUT=60 \
 		-D PUSH_TO_CDASH=TRUE \
-		-D ENABLE_TESTS=OFF \
 		$(cygpath -m $SRCDIR)
 
 	mkdir -p $BUILDDIR/apps/$P/pdb
