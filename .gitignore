@@ -1,0 +1,37 @@
+# 当前仓库根目录下的本地产物、下载文件和自定义脚本
+/tmp/
+/cygwin/
+/x86_64/
+/package-cache/
+
+/license.map
+/md5sums
+
+/remote-setup.ini
+/.buildenv
+/GeneateNestedHints.pl
+
+
+# 当前仓库 scripts 目录中的下载工具与日志
+/scripts/ccache.exe
+/scripts/ninja.exe
+/scripts/osgeo4w-setup.exe
+/scripts/setup-x86_64.exe
+/scripts/setup.log
+/scripts/setup.log.full
+
+
+# 当前仓库 src 目录中的通用产物
+src/**/osgeo4w/package.log*
+src/**/osgeo4w/pip.log*
+src/**/osgeo4w/pip.env
+src/**/osgeo4w/pipped.env
+src/**/osgeo4w/exclude
+src/**/osgeo4w/testfailure
+src/**/osgeo4w/build/
+src/**/osgeo4w/install/
+src/**/osgeo4w/osgeo4w/
+
+
+# 当前仓库中已存在的上游源码工作目录
+/src/qgis-qt6/qgis/
