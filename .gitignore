@@ -9,7 +9,7 @@
 
 /remote-setup.ini
 /.buildenv
-/GeneateNestedHints.pl
+/GenerateNestedHintsOptimized.pl
 
 
 # 当前仓库 scripts 目录中的下载工具与日志
@@ -35,3 +35,5 @@ src/**/osgeo4w/osgeo4w/
 
 # 当前仓库中已存在的上游源码工作目录
 /src/qgis-qt6/qgis/
+/src/qgis-qt6/osgeo4w/qgis-qt6-common-*.txt
+/src/qgis-qt6/osgeo4w/qgis-qt6-server-*.txt
